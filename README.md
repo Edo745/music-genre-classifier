@@ -6,6 +6,9 @@
 - The project's objective is to build a robust classification model capable of distinguishing among 8 distinct musical genres: Rock, Blues, Jazz, Country, EDM, DnB, Drill, Trap.
 
 ## The idea
+The idea is to divide the songe into 30-second chunks and extract features from each chunk before passing them to the classifier. If we have $n$ chunks, we will obtain $n$ predictions. The final prediction will be the genre that receives the highest number of votes from the classifier.
+
+_Note_: the intro and outro of each musical piece have been removed, assuming they are less informative.
 
 <p align="center">
   <img width="700" src="https://github.com/user-attachments/assets/fa4aa8ce-3fd9-456a-a1f0-a0ca520e79ba">
@@ -15,6 +18,7 @@
 - To assemble the dataset, I download from Youtube the playlists related to the 8 musical genres of interest. In particular, 100 songs per genre.
 - I develop a custom code to automate the data collection process. This code allowed the user to simply retrieve the desired playlists and their respective songs.
 - There is no limit, the user can download any playlist of any existing genre.
+
 
 ## Data preprocessing
 - Splitting songs into 30-second segments
@@ -32,9 +36,75 @@ poly_features, tonnetz, zero_crossing_rate
 For the array-type features I calculated both the mean and variance.
 
 ## Dataset Creation
+The dataset creation process began by gathering playlists from YouTube, covering a diverse array of 9 musical genres, ranging from established to emerging ones: blues, country, dnb, drill, edm, jazz, rock, trap and hiphop. Each of these playlists was curated to include 100 songs, resulting in a rich collection of musical compositions.
+
+The next step involved dividing each song into segments, each lasting 30 seconds.
+
+Librosa library is specialized in audio analysis and allowed for the extraction of pertinent features from each individual track.
+
+The features extracted from these 30-second segments were then organized into a Pandas dataframe and used for the models' training.
+
 <p align="center">
-  <img width="700" src="https://github.com/user-attachments/assets/0904eb68-0dba-4d8d-84b4-978ff46a2e5f">
-</p>
+  <img src="https://github.com/user-attachments/assets/7aff53d9-d761-4ded-85c9-fffd71baaba1">
+</p> 
+
+1. Spectral features:
+  
+ * **chroma_stft(*[, y, sr, S, norm, n_fft, ...])**: Compute a chromagram from a waveform or power spectrogram.
+
+ * **chroma_cqt(*[, y, sr, C, hop_length, fmin, ...]**: Constant-Q chromagram
+
+ * **chroma_cens(*[, y, sr, C, hop_length, fmin, ...]**): Compute the chroma variant "Chroma Energy Normalized" (CENS)
+
+ * **chroma_vqt(*[, y, sr, V, hop_length, fmin, ...])**: Variable-Q chromagram
+
+ * **melspectrogram(*[, y, sr, S, n_fft, ...])**: Compute a mel-scaled spectrogram.
+
+ * **mfcc(*[, y, sr, S, n_mfcc, dct_type, norm, ...])**: Mel-frequency cepstral coefficients (MFCCs)
+
+ * **rms(*[, y, S, frame_length, hop_length, ...])**: Compute root-mean-square (RMS) value for each frame, either from the audio samples y or from a spectrogram S.
+
+ * **spectral_centroid(*[, y, sr, S, n_fft, ...])**: Compute the spectral centroid.
+
+ * **spectral_bandwidth(*[, y, sr, S, n_fft, ...])**: Compute p'th-order spectral bandwidth.
+
+ * **spectral_contrast(*[, y, sr, S, n_fft, ...])**: Compute spectral contrast
+
+ * **spectral_flatness(*[, y, S, n_fft, ...])**: Compute spectral flatness
+
+ * **spectral_rolloff(*[, y, sr, S, n_fft, ...])**: Compute roll-off frequency.
+
+ * **poly_features(*[, y, sr, S, n_fft, ...])**: Get coefficients of fitting an nth-order polynomial to the columns of a spectrogram.
+
+ * **tonnetz(*[, y, sr, chroma])**: Compute the tonal centroid features (tonnetz)
+
+ * **zero_crossing_rate(y, *[, frame_length, ...])**: Compute the zero-crossing rate of an audio time series.
+
+
+
+2. Rhythm features
+
+ * **tempo**(*[, y, sr, onset_envelope, tg, ...]): Estimate the tempo (beats per minute)
+
+ * **tempogram**(*[, y, sr, onset_envelope, ...]): Compute the tempogram: local autocorrelation of the onset strength envelope.
+
+ * **fourier_tempogram**(*[, y, sr, ...]): Compute the Fourier tempogram: the short-time Fourier transform of the onset strength envelope.
+
+ * **tempogram_ratio**(*[, y, sr, onset_envelope, ...]): Tempogram ratio features, also known as spectral rhythm patterns.
+
+
+
+3. Beat and tempo
+
+ * **beat_track(*[, y, sr, onset_envelope, ...])**: Dynamic programming beat tracker.
+
+ * **plp(*[, y, sr, onset_envelope, hop_length, ...])**: Predominant local pulse (PLP) estimation.
+
+
+
+
+Here the [official documentation](https://librosa.org/doc/latest/feature.html) for more informations about the features.
+
 
 ## Dataset Balancing - undersampling
 <p align="center">
@@ -60,7 +130,7 @@ joblib.dump(scaler, 'scaler.pkl')
 
 ## Models
 <p align="center">
-  <img width="700" src="https://github.com/user-attachments/assets/132aacc2-ea32-4758-ad16-9e615ab3e6b5">
+  <img width="800" src="https://github.com/user-attachments/assets/132aacc2-ea32-4758-ad16-9e615ab3e6b5">
 </p> 
 
 ## One vs Rest Classifier
